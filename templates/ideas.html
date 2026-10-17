@@ -27,13 +27,13 @@
           Already awesome ideas
       </h2>
 
-      <li class="text-sm">
+      <ul class="text-sm list-disc">
         {% for idea in ideas %}
-        <ul>
+        <li>
           {{ idea }}
-        </ul>
+        </li>
         {% endfor %}
-      </li>
+      </ul>
     </div>
   {% endif %}
 </div>
