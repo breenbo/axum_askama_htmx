@@ -1,12 +1,13 @@
 use askama::Template;
 use axum::{
     Form,
+    extract::State,
     http::StatusCode,
     response::{Html, IntoResponse, Redirect},
 };
-use tower_sessions::Session;
 
 use crate::{
+    database::{AppState, add_idea, get_db_ideas},
     errors::AppError,
     models::IdeaForm,
     templates::{IdeasTemplate, RootTemplate},
@@ -26,12 +27,15 @@ pub async fn root() -> Result<impl IntoResponse, AppError> {
     Ok((StatusCode::OK, Html(rendered)))
 }
 
-pub async fn get_ideas(session: Session) -> Result<impl IntoResponse, AppError> {
+pub async fn get_ideas(
+    // access directly the sqlite connection
+    State(state): State<AppState>,
+) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get /home");
 
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
-    let ids: Vec<String> = session.get("ideas").await?.unwrap_or_default();
+    let ids: Vec<String> = get_db_ideas(state.db).await?;
 
     let ideas = IdeasTemplate {
         tab_title: "Ideas",
@@ -46,19 +50,13 @@ pub async fn get_ideas(session: Session) -> Result<impl IntoResponse, AppError> 
 
 // Form() allow to decode strings sent from post request
 pub async fn create_idea(
-    session: Session,
+    // access directly the sqlite connection
+    State(state): State<AppState>,
     Form(form): Form<IdeaForm>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Post /ideas : {}", form.idea);
 
-    let mut ids: Vec<String> = session.get("ideas").await?.unwrap_or_default();
-
-    ids.push(form.idea);
-
-    tracing::info!("all ids: {:?}", ids);
-
-    // Store back
-    session.insert("ideas", ids).await?;
+    add_idea(&form.idea, state.db).await?;
 
     Ok(Redirect::to("/ideas"))
 }

@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Result};
 
+mod database;
 mod errors;
 mod handlers;
 mod models;
@@ -10,14 +11,15 @@ mod templates;
 async fn main() -> Result<(), Error> {
     const PORT: &str = "8080";
     tracing_subscriber::fmt::init(); // display in console
+    //
+    let app_state = database::connect_sqlite().await?;
 
     let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{PORT}"))
         .await
         .with_context(|| format!("Failed to bind to port {PORT}"))?;
-
     tracing::info!("Router initialized, now listening port {PORT}");
 
-    let app = router::create_router();
+    let app = router::create_router(app_state);
 
     axum::serve(listener, app)
         .await
