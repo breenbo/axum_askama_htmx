@@ -9,16 +9,17 @@ use thiserror::Error;
 // second line: define the enum error
 #[derive(Error, Debug)]
 pub enum AppError {
-    #[error("Askama error: failed to render the template")]
+    // add the precise error message in the terminal with {0}
+    #[error("Askama error: {0}")]
     Template(#[from] askama::Error),
 
-    #[error("Session Error")]
+    #[error("Session Error: {0}")]
     Session(#[from] tower_sessions::session::Error),
 
-    #[error("Db Error")]
+    #[error("Db Error: {0}")]
     Db(#[from] sqlx::Error),
 
-    #[error("Migration Error")]
+    #[error("Migration Error: {0}")]
     Migration(#[from] sqlx::migrate::MigrateError),
 }
 
