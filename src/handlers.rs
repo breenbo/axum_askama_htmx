@@ -17,8 +17,8 @@ use crate::{
 pub async fn root() -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get / root");
     let root = RootTemplate {
-        title: "Some title",
-        some_data: "Some data to display",
+        tab_title: "Some title",
+        title: "Awesome ideas",
     };
 
     let rendered = root.render()?;
@@ -34,7 +34,8 @@ pub async fn get_ideas(session: Session) -> Result<impl IntoResponse, AppError> 
     let ids: Vec<String> = session.get("ideas").await?.unwrap_or_default();
 
     let ideas = IdeasTemplate {
-        title: "Ideas".to_string(),
+        tab_title: "Ideas",
+        title: "Create ideas",
         ideas: ids,
     };
 
@@ -48,7 +49,7 @@ pub async fn create_idea(
     session: Session,
     Form(form): Form<IdeaForm>,
 ) -> Result<Redirect, AppError> {
-    tracing::info!("{}", format!("Post /ideas : {}", form.idea));
+    tracing::info!("Post /ideas : {}", form.idea);
 
     let mut ids: Vec<String> = session.get("ideas").await?.unwrap_or_default();
 

@@ -1,7 +1,4 @@
-{% extends "root.html" %} {% block content %}
-<div class="text-white">
-  <div class="text-4xl mb-6">Ideas</div>
-
+{% extends "base.html" %} {% block content %}
   <form method="POST" action="/ideas">
     <legend>Come on, have an idea</legend>
     <textarea
@@ -27,7 +24,7 @@
           Already awesome ideas
       </h2>
 
-      <ul class="text-sm list-disc">
+      <ul class="text-sm">
         {% for idea in ideas %}
         <li>
           {{ idea }}
@@ -36,5 +33,4 @@
       </ul>
     </div>
   {% endif %}
-</div>
 {% endblock %}

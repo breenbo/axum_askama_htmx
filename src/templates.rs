@@ -7,13 +7,14 @@ use askama::Template;
 #[derive(Template)]
 #[template(path = "root.html")]
 pub struct RootTemplate<'a> {
+    pub tab_title: &'a str,
     pub title: &'a str,
-    pub some_data: &'a str,
 }
 
 #[derive(Template)]
 #[template(path = "ideas.html")]
-pub struct IdeasTemplate {
-    pub title: String,
+pub struct IdeasTemplate<'a> {
+    pub tab_title: &'a str,
+    pub title: &'a str,
     pub ideas: Vec<String>,
 }
