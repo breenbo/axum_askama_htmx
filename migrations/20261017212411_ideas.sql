@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS ideas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     description TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch()),
-    updated_at INTEGER,
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch()),
     deleted_at INTEGER
 )

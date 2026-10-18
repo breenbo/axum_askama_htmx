@@ -19,18 +19,29 @@ pub async fn connect_sqlite() -> Result<AppState, AppError> {
 }
 
 pub async fn add_idea(idea: &str, db: SqlitePool) -> Result<(), AppError> {
-    sqlx::query!("INSERT INTO ideas (description) VALUES (?)", idea)
-        .execute(&db)
-        .await?;
+    sqlx::query!(
+        "INSERT INTO ideas (description, state) VALUES (?, 'pending')",
+        idea
+    )
+    .execute(&db)
+    .await?;
 
     Ok(())
 }
 
-pub async fn get_db_ideas(db: SqlitePool) -> Result<Vec<String>, AppError> {
+pub async fn get_ideas(db: SqlitePool) -> Result<Vec<String>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
-    let ideas = sqlx::query_scalar!("SELECT description FROM ideas")
+    let ideas = sqlx::query_scalar!("SELECT description FROM ideas WHERE state = 'pending'")
         .fetch_all(&db)
         .await?;
 
     Ok(ideas)
+}
+
+pub async fn get_idea(id: u16, db: SqlitePool) -> Result<String, AppError> {
+    let idea = sqlx::query_scalar!("SELECT description FROM ideas WHERE id = ?", id)
+        .fetch_one(&db)
+        .await?;
+
+    Ok(idea)
 }
