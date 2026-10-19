@@ -2,7 +2,17 @@
 <div class="mt-8">
   <h2 class="text-xl">Awesome idea details</h2>
 
-  <div class="text-sm mt-4">{{idea}}</div>
+  <div class="text-sm my-4">{{idea.description}}</div>
+    <a
+      href="/ideas/{{idea.id}}/edit"
+    >
+      <div
+          class="rounded-md bg-indigo-500 text-white px-3 py-2 text-sm font-semibold cursor-pointer"
+        >
+          Go Edit
+      </div>
+    </a>
+
 
   {% endblock %}
 </div>

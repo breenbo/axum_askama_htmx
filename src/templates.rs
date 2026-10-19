@@ -11,9 +11,9 @@ pub struct RootTemplate<'a> {
     pub title: &'a str,
 }
 
-struct Ideas {
-    description: String,
-    id: u16,
+pub struct Idea {
+    pub description: String,
+    pub id: u16,
 }
 
 #[derive(Template)]
@@ -21,7 +21,7 @@ struct Ideas {
 pub struct IdeasTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
-    pub ideas: Vec<String>,
+    pub ideas: Vec<Idea>,
 }
 
 #[derive(Template)]
@@ -29,7 +29,7 @@ pub struct IdeasTemplate<'a> {
 pub struct IdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
-    pub idea: String,
+    pub idea: Idea,
 }
 
 #[derive(Template)]
@@ -37,6 +37,5 @@ pub struct IdeaTemplate<'a> {
 pub struct EditIdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
-    pub idea_description: String,
-    pub id: u16,
+    pub idea: Idea,
 }

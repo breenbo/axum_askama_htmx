@@ -1,4 +1,4 @@
-use crate::errors::AppError;
+use crate::{errors::AppError, templates::Idea};
 use sqlx::SqlitePool;
 
 // app state to use the db in all components
@@ -37,19 +37,30 @@ pub async fn update_idea(id: u16, new_idea: &str, db: SqlitePool) -> Result<(), 
     Ok(())
 }
 
-pub async fn get_ideas(db: SqlitePool) -> Result<Vec<String>, AppError> {
+pub async fn get_ideas(db: SqlitePool) -> Result<Vec<Idea>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
-    let ideas = sqlx::query_scalar!("SELECT description FROM ideas WHERE state = 'pending'")
+    let ideas = sqlx::query!("SELECT description, id FROM ideas WHERE state = 'pending'")
         .fetch_all(&db)
-        .await?;
+        .await?
+        .iter()
+        .map(|idea| Idea {
+            description: idea.description.to_string(),
+            id: idea.id as u16,
+        })
+        .collect();
 
     Ok(ideas)
 }
 
-pub async fn get_idea(id: u16, db: SqlitePool) -> Result<String, AppError> {
-    let idea = sqlx::query_scalar!("SELECT description FROM ideas WHERE id = ?", id)
+pub async fn get_idea(id: u16, db: SqlitePool) -> Result<Idea, AppError> {
+    let record = sqlx::query!("SELECT description,id FROM ideas WHERE id = ?", id)
         .fetch_one(&db)
         .await?;
+
+    let idea = Idea {
+        description: record.description.to_string(),
+        id: record.id as u16,
+    };
 
     Ok(idea)
 }

@@ -27,7 +27,7 @@
       <ul class="text-sm">
         {% for idea in ideas %}
         <li>
-          {{ idea }}
+          <a href="/ideas/{{idea.id}}">{{ idea.description }}</a>
         </li>
         {% endfor %}
       </ul>

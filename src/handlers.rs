@@ -10,7 +10,7 @@ use crate::{
     database::{AppState, add_idea, get_idea, get_ideas, update_idea},
     errors::AppError,
     models::IdeaForm,
-    templates::{EditIdeaTemplate, IdeaTemplate, IdeasTemplate, RootTemplate},
+    templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate, RootTemplate},
 };
 
 // all function used in routes
@@ -35,7 +35,7 @@ pub async fn display_ideas(
 
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
-    let ids: Vec<String> = get_ideas(state.db).await?;
+    let ids: Vec<Idea> = get_ideas(state.db).await?;
 
     let ideas = IdeasTemplate {
         tab_title: "Axum ideas",
@@ -71,13 +71,12 @@ pub async fn display_edit_idea(
     Path(id): Path<u16>,
     State(state): State<AppState>,
 ) -> Result<impl IntoResponse, AppError> {
-    let ida = get_idea(id, state.db).await?;
+    let idea = get_idea(id, state.db).await?;
 
     let edit_idea = EditIdeaTemplate {
         tab_title: "Axum Idea",
         title: "Axum Idea",
-        idea_description: ida,
-        id,
+        idea,
     };
 
     let rendered = edit_idea.render()?;
