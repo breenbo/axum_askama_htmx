@@ -3,7 +3,9 @@ use tower_sessions::{MemoryStore, SessionManagerLayer};
 
 use crate::{
     database::AppState,
-    handlers::{create_idea, display_edit_idea, display_idea, display_ideas, edit_idea, root},
+    handlers::{
+        create_idea, delete_idea, display_edit_idea, display_idea, display_ideas, edit_idea, root,
+    },
 };
 
 pub fn create_router(state: AppState) -> Router {
@@ -18,5 +20,9 @@ pub fn create_router(state: AppState) -> Router {
         )
         .route("/ideas/{id}", get(display_idea))
         .route("/ideas/{id}/edit", get(display_edit_idea).post(edit_idea))
+        .route(
+            "/ideas/{id}/delete",
+            get(display_edit_idea).post(delete_idea),
+        )
         .with_state(state)
 }

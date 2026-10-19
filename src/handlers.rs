@@ -7,7 +7,7 @@ use axum::{
 };
 
 use crate::{
-    database::{AppState, add_idea, get_idea, get_ideas, update_idea},
+    database::{AppState, add_idea, get_idea, get_ideas, remove_idea, update_idea},
     errors::AppError,
     models::IdeaForm,
     templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate, RootTemplate},
@@ -107,6 +107,17 @@ pub async fn create_idea(
     tracing::info!("Post /ideas : {}", form.idea);
 
     add_idea(&form.idea, state.db).await?;
+
+    Ok(Redirect::to("/ideas"))
+}
+
+pub async fn delete_idea(
+    Path(id): Path<u16>,
+    State(state): State<AppState>,
+) -> Result<Redirect, AppError> {
+    tracing::info!("Delete ideas : {}", id);
+
+    remove_idea(id, state.db).await?;
 
     Ok(Redirect::to("/ideas"))
 }

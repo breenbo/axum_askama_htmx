@@ -64,3 +64,11 @@ pub async fn get_idea(id: u16, db: SqlitePool) -> Result<Idea, AppError> {
 
     Ok(idea)
 }
+
+pub async fn remove_idea(id: u16, db: SqlitePool) -> Result<(), AppError> {
+    sqlx::query!("DELETE FROM ideas WHERE id = ?", id)
+        .execute(&db)
+        .await?;
+
+    Ok(())
+}

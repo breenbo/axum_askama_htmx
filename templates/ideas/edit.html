@@ -9,13 +9,21 @@
   >
 {{ idea.description }}</textarea>
 
-  <div class="mt-6">
+  <div class="mt-6 flex items-center gap-x-4">
     <button
       type="submit"
       class="rounded-md bg-indigo-500 text-white px-3 py-2 text-sm font-semibold cursor-pointer"
     >
       Update
     </button>
+    <button
+      type="submit"
+      form="delete-idea-form"
+      class="rounded-md bg-red-500 text-white px-3 py-2 text-sm font-semibold cursor-pointer"
+    >
+      Delete
+    </button>
   </div>
 </form>
+<form id="delete-idea-form" method="POST" action="/ideas/{{idea.id}}/delete"></form>
 {% endblock %}
