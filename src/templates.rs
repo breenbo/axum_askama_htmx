@@ -11,6 +11,11 @@ pub struct RootTemplate<'a> {
     pub title: &'a str,
 }
 
+struct Ideas {
+    description: String,
+    id: u16,
+}
+
 #[derive(Template)]
 #[template(path = "ideas/index.html")]
 pub struct IdeasTemplate<'a> {
@@ -25,4 +30,13 @@ pub struct IdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
     pub idea: String,
+}
+
+#[derive(Template)]
+#[template(path = "ideas/edit.html")]
+pub struct EditIdeaTemplate<'a> {
+    pub tab_title: &'a str,
+    pub title: &'a str,
+    pub idea_description: String,
+    pub id: u16,
 }

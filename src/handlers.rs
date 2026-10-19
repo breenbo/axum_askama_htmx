@@ -7,10 +7,10 @@ use axum::{
 };
 
 use crate::{
-    database::{AppState, add_idea, get_idea, get_ideas},
+    database::{AppState, add_idea, get_idea, get_ideas, update_idea},
     errors::AppError,
     models::IdeaForm,
-    templates::{IdeaTemplate, IdeasTemplate, RootTemplate},
+    templates::{EditIdeaTemplate, IdeaTemplate, IdeasTemplate, RootTemplate},
 };
 
 // all function used in routes
@@ -38,8 +38,8 @@ pub async fn display_ideas(
     let ids: Vec<String> = get_ideas(state.db).await?;
 
     let ideas = IdeasTemplate {
-        tab_title: "Ideas",
-        title: "Create ideas",
+        tab_title: "Axum ideas",
+        title: "Axum ideas",
         ideas: ids,
     };
 
@@ -56,10 +56,9 @@ pub async fn display_idea(
     tracing::info!("Get idea {id}");
 
     let ida = get_idea(id, state.db).await?;
-
     let idea = IdeaTemplate {
-        tab_title: "Idea",
-        title: "Idea",
+        tab_title: "Axum Idea",
+        title: "Axum Idea",
         idea: ida,
     };
 
@@ -68,10 +67,42 @@ pub async fn display_idea(
     Ok((StatusCode::OK, Html(rendered)))
 }
 
+pub async fn display_edit_idea(
+    Path(id): Path<u16>,
+    State(state): State<AppState>,
+) -> Result<impl IntoResponse, AppError> {
+    let ida = get_idea(id, state.db).await?;
+
+    let edit_idea = EditIdeaTemplate {
+        tab_title: "Axum Idea",
+        title: "Axum Idea",
+        idea_description: ida,
+        id,
+    };
+
+    let rendered = edit_idea.render()?;
+
+    Ok((StatusCode::OK, Html(rendered)))
+}
+
+pub async fn edit_idea(
+    Path(id): Path<u16>,
+    State(state): State<AppState>,
+    // !!!!!!!!! form always last parameter !!!!!!!!!
+    Form(form): Form<IdeaForm>,
+) -> Result<Redirect, AppError> {
+    tracing::info!("Update idea {id}");
+
+    update_idea(id, &form.idea, state.db).await?;
+
+    Ok(Redirect::to(&format!("/ideas/{id}")))
+}
+
 // Form() allow to decode strings sent from post request
 pub async fn create_idea(
     // access directly the sqlite connection
     State(state): State<AppState>,
+    // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Post /ideas : {}", form.idea);

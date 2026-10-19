@@ -29,6 +29,14 @@ pub async fn add_idea(idea: &str, db: SqlitePool) -> Result<(), AppError> {
     Ok(())
 }
 
+pub async fn update_idea(id: u16, new_idea: &str, db: SqlitePool) -> Result<(), AppError> {
+    sqlx::query!("UPDATE ideas SET description=? WHERE id=?", new_idea, id)
+        .execute(&db)
+        .await?;
+
+    Ok(())
+}
+
 pub async fn get_ideas(db: SqlitePool) -> Result<Vec<String>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
     let ideas = sqlx::query_scalar!("SELECT description FROM ideas WHERE state = 'pending'")

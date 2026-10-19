@@ -53,7 +53,8 @@ impl IntoResponse for AppError {
                 r#"
                     <h1>Error {status}</h1>
                     <p>{error_message}</p>
-                    <a href="/" class="mt-8">Go back home</a>"#
+                    <a href="/" class="mt-8">Go back home</a>
+                "#
             )),
         )
             .into_response() // convertit le tuple en Response attendu par Axum
