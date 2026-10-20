@@ -1,31 +1,35 @@
-use sqlx::SqlitePool;
+use std::sync::Arc;
 
 use super::templates::Idea;
-use crate::errors::AppError;
+use crate::{database::AppState, errors::AppError};
 
-pub async fn add_idea(idea: &str, db: SqlitePool) -> Result<(), AppError> {
+pub async fn add_idea(idea: &str, app_state: Arc<AppState>) -> Result<(), AppError> {
     sqlx::query!(
         "INSERT INTO ideas (description, state) VALUES (?, 'pending')",
         idea
     )
-    .execute(&db)
+    .execute(&app_state.db)
     .await?;
 
     Ok(())
 }
 
-pub async fn update_idea(id: u16, new_idea: &str, db: SqlitePool) -> Result<(), AppError> {
+pub async fn update_idea(
+    id: u16,
+    new_idea: &str,
+    app_state: Arc<AppState>,
+) -> Result<(), AppError> {
     sqlx::query!("UPDATE ideas SET description=? WHERE id=?", new_idea, id)
-        .execute(&db)
+        .execute(&app_state.db)
         .await?;
 
     Ok(())
 }
 
-pub async fn get_ideas(db: SqlitePool) -> Result<Vec<Idea>, AppError> {
+pub async fn get_ideas(app_state: Arc<AppState>) -> Result<Vec<Idea>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
     let ideas = sqlx::query!("SELECT description, id FROM ideas WHERE state = 'pending'")
-        .fetch_all(&db)
+        .fetch_all(&app_state.db)
         .await?
         .iter()
         .map(|idea| Idea {
@@ -37,9 +41,9 @@ pub async fn get_ideas(db: SqlitePool) -> Result<Vec<Idea>, AppError> {
     Ok(ideas)
 }
 
-pub async fn get_idea(id: u16, db: SqlitePool) -> Result<Idea, AppError> {
+pub async fn get_idea(id: u16, app_state: Arc<AppState>) -> Result<Idea, AppError> {
     let record = sqlx::query!("SELECT description,id FROM ideas WHERE id = ?", id)
-        .fetch_one(&db)
+        .fetch_one(&app_state.db)
         .await?;
 
     let idea = Idea {
@@ -50,9 +54,9 @@ pub async fn get_idea(id: u16, db: SqlitePool) -> Result<Idea, AppError> {
     Ok(idea)
 }
 
-pub async fn remove_idea(id: u16, db: SqlitePool) -> Result<(), AppError> {
+pub async fn remove_idea(id: u16, app_state: Arc<AppState>) -> Result<(), AppError> {
     sqlx::query!("DELETE FROM ideas WHERE id = ?", id)
-        .execute(&db)
+        .execute(&app_state.db)
         .await?;
 
     Ok(())

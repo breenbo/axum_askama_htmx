@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use askama::Template;
 use axum::{
     Form,
@@ -15,13 +17,13 @@ use crate::{database::AppState, errors::AppError};
 
 pub async fn display_ideas(
     // access directly the sqlite connection
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get /home");
 
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
-    let ids: Vec<Idea> = get_ideas(state.db).await?;
+    let ids: Vec<Idea> = get_ideas(Arc::clone(&state)).await?;
 
     let ideas = IdeasTemplate {
         tab_title: "Axum ideas",
@@ -37,11 +39,11 @@ pub async fn display_ideas(
 // get one idea, the id is passed in the url "ideas/1" => use Path to get the value
 pub async fn display_idea(
     Path(id): Path<u16>,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get idea {id}");
 
-    let ida = get_idea(id, state.db).await?;
+    let ida = get_idea(id, Arc::clone(&state)).await?;
     let idea = IdeaTemplate {
         tab_title: "Axum Idea",
         title: "Axum Idea",
@@ -55,9 +57,9 @@ pub async fn display_idea(
 
 pub async fn display_edit_idea(
     Path(id): Path<u16>,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    let idea = get_idea(id, state.db).await?;
+    let idea = get_idea(id, Arc::clone(&state)).await?;
 
     let edit_idea = EditIdeaTemplate {
         tab_title: "Axum Idea",
@@ -72,13 +74,13 @@ pub async fn display_edit_idea(
 
 pub async fn edit_idea(
     Path(id): Path<u16>,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
     // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Update idea {id}");
 
-    update_idea(id, &form.idea, state.db).await?;
+    update_idea(id, &form.idea, Arc::clone(&state)).await?;
 
     Ok(Redirect::to(&format!("/ideas/{id}")))
 }
@@ -86,24 +88,24 @@ pub async fn edit_idea(
 // Form() allow to decode strings sent from post request
 pub async fn create_idea(
     // access directly the sqlite connection
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
     // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Post /ideas : {}", form.idea);
 
-    add_idea(&form.idea, state.db).await?;
+    add_idea(&form.idea, Arc::clone(&state)).await?;
 
     Ok(Redirect::to("/ideas"))
 }
 
 pub async fn delete_idea(
     Path(id): Path<u16>,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Delete ideas : {}", id);
 
-    remove_idea(id, state.db).await?;
+    remove_idea(id, Arc::clone(&state)).await?;
 
     Ok(Redirect::to("/ideas"))
 }

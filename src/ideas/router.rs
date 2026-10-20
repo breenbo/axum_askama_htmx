@@ -1,9 +1,12 @@
+use std::sync::Arc;
+
 use axum::{Router, routing::get};
 
 use super::handlers::*;
 use crate::database::AppState;
 
-pub fn router() -> Router<AppState> {
+// return Arc<AppState> because it will be added after the merge to have a full Router
+pub fn router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/ideas", get(display_ideas).post(create_idea))
         .route("/ideas/{id}", get(display_idea))
