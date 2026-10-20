@@ -9,6 +9,10 @@
   >
 {{ idea.description }}</textarea>
 
+  {% if let Some(err_msg) = error %}
+  <p class="text-red-300 text-sm mt-1">{{ err_msg }}</p>
+  {% endif %}
+
   <div class="mt-6 flex items-center gap-x-4">
     <button
       type="submit"

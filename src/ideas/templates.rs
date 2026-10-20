@@ -6,26 +6,68 @@ pub struct Idea {
 }
 
 #[derive(Template)]
+#[template(path = "ideas/show.html")]
+pub struct IdeaTemplate<'a> {
+    pub tab_title: &'a str,
+    pub title: &'a str,
+    pub idea: Idea,
+}
+impl<'a> Default for IdeaTemplate<'a> {
+    fn default() -> Self {
+        Self {
+            tab_title: "Axum Idea",
+            title: "Axum Idea",
+            idea: Idea {
+                description: String::new(),
+                id: 0,
+            },
+        }
+    }
+}
+
+#[derive(Template)]
 #[template(path = "ideas/index.html")]
 pub struct IdeasTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
     pub ideas: Vec<Idea>,
 }
-
-#[derive(Template)]
-#[template(path = "ideas/create.html")]
-pub struct CreateIdeaTemplate {
-    pub tab_title: String,
-    pub title: String,
+impl<'a> Default for IdeasTemplate<'a> {
+    fn default() -> Self {
+        Self {
+            tab_title: "Axum Ideas",
+            title: "Axum Ideas",
+            ideas: Vec::new(),
+        }
+    }
 }
 
 #[derive(Template)]
-#[template(path = "ideas/show.html")]
-pub struct IdeaTemplate<'a> {
+#[template(path = "ideas/create.html")]
+pub struct CreateIdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
-    pub idea: Idea,
+    pub error: Option<String>, // manage the validation error in the form
+    pub description: String,
+}
+impl<'a> Default for CreateIdeaTemplate<'a> {
+    fn default() -> Self {
+        Self {
+            tab_title: "Axum Create Idea",
+            title: "Axum Create Idea",
+            error: None,
+            description: String::new(),
+        }
+    }
+}
+impl<'a> CreateIdeaTemplate<'a> {
+    pub fn with_error_message(error_message: String, description: String) -> Self {
+        Self {
+            error: Some(error_message),
+            description,
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Template)]
@@ -34,4 +76,27 @@ pub struct EditIdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
     pub idea: Idea,
+    pub error: Option<String>,
+}
+impl<'a> Default for EditIdeaTemplate<'a> {
+    fn default() -> Self {
+        Self {
+            tab_title: "Axum Edit Idea",
+            title: "Axum Edit Idea",
+            idea: Idea {
+                description: String::new(),
+                id: 0,
+            },
+            error: None,
+        }
+    }
+}
+impl<'a> EditIdeaTemplate<'a> {
+    pub fn with_error_message(error_message: String, idea: Idea) -> Self {
+        Self {
+            error: Some(error_message),
+            idea,
+            ..Default::default()
+        }
+    }
 }
