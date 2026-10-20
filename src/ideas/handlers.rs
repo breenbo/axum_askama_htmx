@@ -6,26 +6,12 @@ use axum::{
     response::{Html, IntoResponse, Redirect},
 };
 
-use crate::{
-    database::{AppState, add_idea, get_idea, get_ideas, remove_idea, update_idea},
-    errors::AppError,
+use super::{
+    database::{add_idea, get_idea, get_ideas, remove_idea, update_idea},
     models::IdeaForm,
-    templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate, RootTemplate},
+    templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate},
 };
-
-// all function used in routes
-//
-pub async fn root() -> Result<impl IntoResponse, AppError> {
-    tracing::info!("Get / root");
-    let root = RootTemplate {
-        tab_title: "Some title",
-        title: "Awesome ideas",
-    };
-
-    let rendered = root.render()?;
-
-    Ok((StatusCode::OK, Html(rendered)))
-}
+use crate::{database::AppState, errors::AppError};
 
 pub async fn display_ideas(
     // access directly the sqlite connection

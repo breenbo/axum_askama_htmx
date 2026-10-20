@@ -2,10 +2,9 @@ use anyhow::{Context, Error, Result};
 
 mod database;
 mod errors;
-mod handlers;
-mod models;
+mod ideas;
+mod root;
 mod router;
-mod templates;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
