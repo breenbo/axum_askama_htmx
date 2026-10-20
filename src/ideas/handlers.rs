@@ -7,6 +7,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Redirect},
 };
+use validator::Validate;
 
 use super::{
     database::{add_idea, get_idea, get_ideas, remove_idea, update_idea},
@@ -72,6 +73,24 @@ pub async fn display_edit_idea(
     Ok((StatusCode::OK, Html(rendered)))
 }
 
+// Form() allow to decode strings sent from post request
+pub async fn create_idea(
+    // access directly the sqlite connection
+    State(state): State<Arc<AppState>>,
+    // !!!!!!!!! form always last parameter !!!!!!!!!
+    Form(form): Form<IdeaForm>,
+) -> Result<Redirect, AppError> {
+    tracing::info!("Post /ideas : {}", form.description);
+
+    if let Err(error) = form.validate() {
+        return Err(AppError::IdeaForm(error));
+    }
+
+    add_idea(&form.description, Arc::clone(&state)).await?;
+
+    Ok(Redirect::to("/ideas"))
+}
+
 pub async fn edit_idea(
     Path(id): Path<u16>,
     State(state): State<Arc<AppState>>,
@@ -80,23 +99,9 @@ pub async fn edit_idea(
 ) -> Result<Redirect, AppError> {
     tracing::info!("Update idea {id}");
 
-    update_idea(id, &form.idea, Arc::clone(&state)).await?;
+    update_idea(id, &form.description, Arc::clone(&state)).await?;
 
     Ok(Redirect::to(&format!("/ideas/{id}")))
-}
-
-// Form() allow to decode strings sent from post request
-pub async fn create_idea(
-    // access directly the sqlite connection
-    State(state): State<Arc<AppState>>,
-    // !!!!!!!!! form always last parameter !!!!!!!!!
-    Form(form): Form<IdeaForm>,
-) -> Result<Redirect, AppError> {
-    tracing::info!("Post /ideas : {}", form.idea);
-
-    add_idea(&form.idea, Arc::clone(&state)).await?;
-
-    Ok(Redirect::to("/ideas"))
 }
 
 pub async fn delete_idea(
