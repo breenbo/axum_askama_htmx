@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use anyhow::Result;
 use askama::Template;
 use axum::{
     Form,
@@ -14,7 +15,7 @@ use super::{
     models::IdeaForm,
     templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate},
 };
-use crate::{database::AppState, errors::AppError};
+use crate::{database::AppState, errors::AppError, ideas::templates::CreateIdeaTemplate};
 
 pub async fn display_ideas(
     // access directly the sqlite connection
@@ -33,6 +34,17 @@ pub async fn display_ideas(
     };
 
     let rendered = ideas.render()?;
+
+    Ok((StatusCode::OK, Html(rendered)))
+}
+
+pub async fn display_create_idea() -> Result<impl IntoResponse, AppError> {
+    let create_idea = CreateIdeaTemplate {
+        tab_title: "Axum create Idea".to_string(),
+        title: "Axum Create An Idea".to_string(),
+    };
+
+    let rendered = create_idea.render()?;
 
     Ok((StatusCode::OK, Html(rendered)))
 }

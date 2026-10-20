@@ -14,6 +14,13 @@ pub struct IdeasTemplate<'a> {
 }
 
 #[derive(Template)]
+#[template(path = "ideas/create.html")]
+pub struct CreateIdeaTemplate {
+    pub tab_title: String,
+    pub title: String,
+}
+
+#[derive(Template)]
 #[template(path = "ideas/show.html")]
 pub struct IdeaTemplate<'a> {
     pub tab_title: &'a str,
