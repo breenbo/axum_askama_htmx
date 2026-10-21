@@ -1,13 +1,14 @@
 {% extends "../base.html" %} {% block content %}
-<div class="mt-8">
-  <h2 class="text-xl">Awesome idea details</h2>
-
-  <div class="text-sm my-4">{{idea.description}}</div>
+<div class="text-4xl mb-6">
+  {{title}}
+</div>
+<div class="mt-4">
+  <div class="text-lg my-4">{{idea.description}}</div>
     <a
       href="/ideas/{{idea.id}}/edit"
     >
       <div
-          class="w-fit rounded-md bg-indigo-500 text-white px-3 py-2 text-sm font-semibold cursor-pointer"
+          class="btn btn-primary"
         >
           Go Edit
       </div>

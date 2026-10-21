@@ -16,7 +16,7 @@ impl<'a> Default for IdeaTemplate<'a> {
     fn default() -> Self {
         Self {
             tab_title: "Axum Idea",
-            title: "Axum Idea",
+            title: "Awesome Axum Idea",
             idea: Idea {
                 description: String::new(),
                 id: 0,
@@ -35,8 +35,8 @@ pub struct IdeasTemplate<'a> {
 impl<'a> Default for IdeasTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Axum Ideas",
-            title: "Axum Ideas",
+            tab_title: "Axum Awesome Ideas",
+            title: "Axum Awesome Ideas",
             ideas: Vec::new(),
         }
     }

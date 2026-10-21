@@ -1,9 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="acid">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
     <script
       src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"
       integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg"
@@ -11,8 +13,13 @@
     ></script>
     <title>{% block title %}{{tab_title}}{% endblock %}</title>
   </head>
-  <body class="bg-neutral-700 text-white p-6 max-w-xl ml-12 text-sm">
-    <div class="text-4xl mb-6">{{title}}</div>
-    {% block content %}{% endblock %}
+
+  <body>
+    {% include "./base/navbar.html" %}
+
+    <main class="mt-8 max-w-4xl mx-auto">
+        {% block content %}{% endblock %}
+    </main>
   </body>
+
 </html>
