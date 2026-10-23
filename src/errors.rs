@@ -21,6 +21,12 @@ pub enum AppError {
 
     #[error("Migration Error: {0}")]
     Migration(#[from] sqlx::migrate::MigrateError),
+
+    #[error("Hash password error: {0}")]
+    HashPassword(#[from] argon2::password_hash::Error),
+
+    #[error("Email already taken")]
+    EmailAlreadyTaken,
 }
 
 // transform AppError to http response for Axum
@@ -45,6 +51,11 @@ impl IntoResponse for AppError {
                 _ => (StatusCode::INTERNAL_SERVER_ERROR, "Error db management"),
             },
             AppError::Migration(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Error during migration"),
+            AppError::HashPassword(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error saving securely your password",
+            ),
+            AppError::EmailAlreadyTaken => (StatusCode::CONFLICT, "Email already taken"),
         };
 
         (

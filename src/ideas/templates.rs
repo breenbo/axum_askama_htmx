@@ -11,6 +11,7 @@ pub struct IdeaTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
     pub idea: Idea,
+    pub is_logged_in: bool,
 }
 impl<'a> Default for IdeaTemplate<'a> {
     fn default() -> Self {
@@ -21,6 +22,7 @@ impl<'a> Default for IdeaTemplate<'a> {
                 description: String::new(),
                 id: 0,
             },
+            is_logged_in: false,
         }
     }
 }
@@ -31,6 +33,7 @@ pub struct IdeasTemplate<'a> {
     pub tab_title: &'a str,
     pub title: &'a str,
     pub ideas: Vec<Idea>,
+    pub is_logged_in: bool,
 }
 impl<'a> Default for IdeasTemplate<'a> {
     fn default() -> Self {
@@ -38,6 +41,7 @@ impl<'a> Default for IdeasTemplate<'a> {
             tab_title: "Axum Awesome Ideas",
             title: "Axum Awesome Ideas",
             ideas: Vec::new(),
+            is_logged_in: false,
         }
     }
 }
@@ -49,6 +53,7 @@ pub struct CreateIdeaTemplate<'a> {
     pub title: &'a str,
     pub error: Option<String>, // manage the validation error in the form
     pub description: String,
+    pub is_logged_in: bool,
 }
 impl<'a> Default for CreateIdeaTemplate<'a> {
     fn default() -> Self {
@@ -57,6 +62,7 @@ impl<'a> Default for CreateIdeaTemplate<'a> {
             title: "Axum Create Idea",
             error: None,
             description: String::new(),
+            is_logged_in: false,
         }
     }
 }
@@ -77,6 +83,7 @@ pub struct EditIdeaTemplate<'a> {
     pub title: &'a str,
     pub idea: Idea,
     pub error: Option<String>,
+    pub is_logged_in: bool,
 }
 impl<'a> Default for EditIdeaTemplate<'a> {
     fn default() -> Self {
@@ -88,6 +95,7 @@ impl<'a> Default for EditIdeaTemplate<'a> {
                 id: 0,
             },
             error: None,
+            is_logged_in: false,
         }
     }
 }

@@ -13,7 +13,7 @@ pub async fn root() -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get / root");
     let root = RootTemplate {
         tab_title: "Some title",
-        title: "Awesome ideas",
+        is_logged_in: false,
     };
 
     let rendered = root.render()?;

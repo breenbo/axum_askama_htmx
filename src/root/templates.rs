@@ -8,5 +8,5 @@ use askama::Template;
 #[template(path = "root.html")]
 pub struct RootTemplate<'a> {
     pub tab_title: &'a str,
-    pub title: &'a str,
+    pub is_logged_in: bool,
 }

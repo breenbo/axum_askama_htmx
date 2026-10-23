@@ -8,6 +8,7 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Redirect, Response},
 };
+use tower_sessions::Session;
 use validator::Validate;
 
 use super::{
@@ -19,16 +20,19 @@ use crate::{database::AppState, errors::AppError, ideas::templates::CreateIdeaTe
 
 pub async fn display_ideas(
     // access directly the sqlite connection
+    session: Session,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get /home");
 
+    let is_logged_in = session.get::<i64>("user_id").await?.is_some();
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
     let idas: Vec<Idea> = get_ideas(Arc::clone(&state)).await?;
 
     let ideas = IdeasTemplate {
         ideas: idas,
+        is_logged_in,
         ..Default::default()
     };
 
@@ -47,13 +51,17 @@ pub async fn display_create_idea() -> Result<impl IntoResponse, AppError> {
 // get one idea, the id is passed in the url "ideas/1" => use Path to get the value
 pub async fn display_idea(
     Path(id): Path<u16>,
+    session: Session,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get idea {id}");
 
     let ida = get_idea(id, Arc::clone(&state)).await?;
+    let is_logged_in = session.get::<i64>("user_id").await?.is_some();
+
     let idea = IdeaTemplate {
         idea: ida,
+        is_logged_in,
         ..Default::default()
     };
 

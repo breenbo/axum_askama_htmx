@@ -1,6 +1,6 @@
 use anyhow::{Context, Error, Result};
-use axum::extract::State;
 
+mod auth;
 mod database;
 mod errors;
 mod ideas;
@@ -19,7 +19,7 @@ async fn main() -> Result<(), Error> {
         .with_context(|| format!("Failed to bind to port {PORT}"))?;
     tracing::info!("Router initialized, now listening port {PORT}");
 
-    let app = router::create_router(State(app_state));
+    let app = router::create_router(app_state);
 
     axum::serve(listener, app)
         .await
