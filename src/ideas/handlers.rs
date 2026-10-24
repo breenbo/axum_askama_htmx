@@ -16,7 +16,10 @@ use super::{
     templates::{CreateIdeaTemplate, EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate},
 };
 use crate::{
-    auth::extractors::CurrentUser, base::templates::Base, database::AppState, errors::AppError,
+    auth::extractors::{CurrentUser, RequireUser},
+    base::templates::Base,
+    database::AppState,
+    errors::AppError,
 };
 
 pub async fn display_ideas(
@@ -24,7 +27,7 @@ pub async fn display_ideas(
     user: CurrentUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    tracing::info!("Get /home");
+    tracing::info!("Get /ideas");
 
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
@@ -44,10 +47,12 @@ pub async fn display_ideas(
     Ok((StatusCode::OK, Html(rendered)))
 }
 
-pub async fn display_create_idea(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
+pub async fn display_create_idea(_user: RequireUser) -> Result<impl IntoResponse, AppError> {
     let create_idea = CreateIdeaTemplate {
         base: Base {
-            is_logged_in: user.0.is_some(),
+            // handler only fired for logged in user because of RequireUser, which redirect to login
+            // if guest
+            is_logged_in: true,
             ..Default::default()
         },
         ..Default::default()
@@ -83,7 +88,7 @@ pub async fn display_idea(
 
 pub async fn display_edit_idea(
     Path(id): Path<u16>,
-    user: CurrentUser,
+    _user: RequireUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     let idea = get_idea(id, Arc::clone(&state)).await?;
@@ -91,7 +96,7 @@ pub async fn display_edit_idea(
     let edit_idea = EditIdeaTemplate {
         idea,
         base: Base {
-            is_logged_in: user.0.is_some(),
+            is_logged_in: true,
             ..Default::default()
         },
         ..Default::default()
@@ -106,6 +111,7 @@ pub async fn display_edit_idea(
 pub async fn create_idea(
     // access directly the sqlite connection
     State(state): State<Arc<AppState>>,
+    _user: RequireUser,
     // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Response, AppError> {
@@ -126,6 +132,7 @@ pub async fn create_idea(
 pub async fn edit_idea(
     Path(id): Path<u16>,
     State(state): State<Arc<AppState>>,
+    _user: RequireUser,
     // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Response, AppError> {
@@ -151,6 +158,7 @@ pub async fn edit_idea(
 
 pub async fn delete_idea(
     Path(id): Path<u16>,
+    _user: RequireUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<Redirect, AppError> {
     tracing::info!("Delete ideas : {}", id);

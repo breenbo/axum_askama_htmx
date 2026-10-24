@@ -74,25 +74,31 @@ pub async fn login_user(
     Form(form): Form<LoginForm>,
 ) -> Result<impl IntoResponse, AppError> {
     // get user in db with email
+    // get_user return an option, none if email not found
     let user = get_user(&form.email, &state).await?;
-    // compare password
-    let is_valid = verify_password(&form.password, &user.hashed_pwd);
-    // if match, render template with logged_in: true in base template?
-    if is_valid {
-        log_in_session(&session, user.id).await?;
 
-        // need to render something
-        Ok((StatusCode::OK, Redirect::to("/ideas")).into_response())
-    } else {
-        tracing::warn!("Bad credentials");
-        let temp = LoginTemplate {
-            error: Some("Credentials doesn't match"),
-            email: form.email,
-            ..Default::default()
-        };
-        let rendered = temp.render()?;
+    let valid_user = match user {
+        Some(u) if verify_password(&form.password, &u.hashed_pwd) => Some(u),
+        _ => None,
+    };
 
-        Ok((StatusCode::BAD_REQUEST, Html(rendered)).into_response())
+    match valid_user {
+        Some(u) => {
+            log_in_session(&session, u.id).await?;
+            // need to render something
+            Ok(Redirect::to("/ideas").into_response())
+        }
+        None => {
+            tracing::warn!("Bad credentials");
+            let temp = LoginTemplate {
+                error: Some("Credentials doesn't match"),
+                email: form.email,
+                ..Default::default()
+            };
+            let rendered = temp.render()?;
+
+            Ok((StatusCode::BAD_REQUEST, Html(rendered)).into_response())
+        }
     }
 }
 

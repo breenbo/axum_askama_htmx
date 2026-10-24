@@ -36,15 +36,18 @@ pub async fn create_user(user: &RegisterForm, app_state: Arc<AppState>) -> Resul
     }
 }
 
-pub async fn get_user(email: &str, app_state: &Arc<AppState>) -> Result<User, AppError> {
+pub async fn get_user(email: &str, app_state: &Arc<AppState>) -> Result<Option<User>, AppError> {
     let res = sqlx::query!("SELECT * FROM users WHERE email = ?", email)
-        .fetch_one(&app_state.db)
+        .fetch_optional(&app_state.db)
         .await?;
 
-    Ok(User {
-        id: res.id,
-        name: res.name,
-        email: res.email,
-        hashed_pwd: res.password,
-    })
+    match res {
+        Some(res) => Ok(Some(User {
+            id: res.id,
+            name: res.name,
+            email: res.email,
+            hashed_pwd: res.password,
+        })),
+        None => Ok(None),
+    }
 }
