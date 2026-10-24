@@ -7,7 +7,7 @@
       <legend class="fieldset-legend">Login</legend>
 
       <label class="label">Email</label>
-      <input type="email" class="input" placeholder="Email" name="email" />
+      <input type="email" class="input" placeholder="Email" name="email" value="{{email}}"/>
 
       <label class="label">Password</label>
       <input
@@ -16,6 +16,12 @@
         placeholder="Password"
         name="password"
       />
+
+      {% if let Some(error) = error %}
+        <div class="text-xs text-red-500">
+          {{ error }}
+        </div>
+      {% endif %}
 
       <button type="submit" class="btn btn-neutral mt-4">Login</button>
     </fieldset>

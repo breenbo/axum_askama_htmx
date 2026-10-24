@@ -6,6 +6,20 @@ use crate::base::templates::Base;
 #[template(path = "auth/Login.html")]
 pub struct LoginTemplate<'a> {
     pub base: Base<'a>,
+    pub email: String,
+    pub error: Option<&'a str>,
+}
+impl<'a> Default for LoginTemplate<'a> {
+    fn default() -> Self {
+        Self {
+            base: Base {
+                tab_title: "Login",
+                ..Default::default()
+            },
+            email: String::new(),
+            error: None,
+        }
+    }
 }
 
 #[derive(Template)]

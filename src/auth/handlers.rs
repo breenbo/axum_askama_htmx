@@ -61,6 +61,7 @@ pub async fn display_login_form() -> Result<impl IntoResponse, AppError> {
             tab_title: "Login",
             is_logged_in: false,
         },
+        ..Default::default()
     };
     let rendered = login.render()?;
 
@@ -81,12 +82,17 @@ pub async fn login_user(
         log_in_session(&session, user.id).await?;
 
         // need to render something
-        Ok(Redirect::to("/ideas"))
+        Ok((StatusCode::OK, Redirect::to("/ideas")).into_response())
     } else {
         tracing::warn!("Bad credentials");
+        let temp = LoginTemplate {
+            error: Some("Credentials doesn't match"),
+            email: form.email,
+            ..Default::default()
+        };
+        let rendered = temp.render()?;
 
-        // TODO: template with error in form, like the register
-        Ok(Redirect::to("/login"))
+        Ok((StatusCode::BAD_REQUEST, Html(rendered)).into_response())
     }
 }
 
