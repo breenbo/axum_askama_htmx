@@ -28,7 +28,8 @@ pub async fn display_ideas(
 
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
-    let idas: Vec<Idea> = get_ideas(Arc::clone(&state)).await?;
+    let user_id = user.0;
+    let idas: Vec<Idea> = get_ideas(Arc::clone(&state), user_id).await?;
 
     let ideas = IdeasTemplate {
         ideas: idas,
@@ -106,6 +107,7 @@ pub async fn display_create_idea() -> Result<impl IntoResponse, AppError> {
 pub async fn create_idea(
     // access directly the sqlite connection
     State(state): State<Arc<AppState>>,
+    user: CurrentUser,
     // !!!!!!!!! form always last parameter !!!!!!!!!
     Form(form): Form<IdeaForm>,
 ) -> Result<Response, AppError> {
@@ -118,7 +120,8 @@ pub async fn create_idea(
         return Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(rendered)).into_response());
     }
 
-    add_idea(&form.description, Arc::clone(&state)).await?;
+    let user_id = user.0;
+    add_idea(&form.description, Arc::clone(&state), user_id).await?;
 
     Ok(Redirect::to("/ideas").into_response())
 }

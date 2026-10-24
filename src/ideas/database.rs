@@ -3,13 +3,20 @@ use std::sync::Arc;
 use super::templates::Idea;
 use crate::{database::AppState, errors::AppError};
 
-pub async fn add_idea(idea: &str, app_state: Arc<AppState>) -> Result<(), AppError> {
-    sqlx::query!(
-        "INSERT INTO ideas (description, state) VALUES (?, 'pending')",
-        idea
-    )
-    .execute(&app_state.db)
-    .await?;
+pub async fn add_idea(
+    idea: &str,
+    app_state: Arc<AppState>,
+    user_id: Option<i64>,
+) -> Result<(), AppError> {
+    if let Some(user_id) = user_id {
+        sqlx::query!(
+            "INSERT INTO ideas (description, state, user_id) VALUES (?, 'pending',?)",
+            idea,
+            user_id
+        )
+        .execute(&app_state.db)
+        .await?;
+    }
 
     Ok(())
 }
@@ -26,9 +33,16 @@ pub async fn update_idea(
     Ok(())
 }
 
-pub async fn get_ideas(app_state: Arc<AppState>) -> Result<Vec<Idea>, AppError> {
+pub async fn get_ideas(
+    app_state: Arc<AppState>,
+    user_id: Option<i64>,
+) -> Result<Vec<Idea>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
-    let ideas = sqlx::query!("SELECT description, id FROM ideas WHERE state = 'pending'")
+    let ideas = if let Some(user_id) = user_id {
+        sqlx::query!(
+            "SELECT description, id FROM ideas WHERE state = 'pending' AND user_id = ?",
+            user_id
+        )
         .fetch_all(&app_state.db)
         .await?
         .iter()
@@ -36,7 +50,10 @@ pub async fn get_ideas(app_state: Arc<AppState>) -> Result<Vec<Idea>, AppError> 
             description: idea.description.to_string(),
             id: idea.id as u16,
         })
-        .collect();
+        .collect()
+    } else {
+        Vec::new()
+    };
 
     Ok(ideas)
 }
