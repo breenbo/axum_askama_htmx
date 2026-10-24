@@ -1,18 +1,23 @@
 use std::sync::Arc;
 
 use axum::{
-    Router,
+    Router, middleware,
     routing::{get, post},
 };
 
 use super::handlers::{
     display_login_form, display_register_form, login_user, logout_user, register_user,
 };
-use crate::database::AppState;
+use crate::{auth::middlewares::require_auth, database::AppState};
 
 pub fn router() -> Router<Arc<AppState>> {
-    Router::new()
-        .route("/register", get(display_register_form).post(register_user))
-        .route("/login", get(display_login_form).post(login_user))
+    let protected = Router::new()
         .route("/logout", post(logout_user))
+        .route_layer(middleware::from_fn(require_auth));
+
+    let public = Router::new()
+        .route("/register", get(display_register_form).post(register_user))
+        .route("/login", get(display_login_form).post(login_user));
+
+    public.merge(protected)
 }

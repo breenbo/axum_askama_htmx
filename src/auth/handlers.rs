@@ -15,13 +15,20 @@ use super::{
     models::{LoginForm, RegisterForm},
     templates::{LoginTemplate, RegisterTemplate},
 };
-use crate::{base::templates::Base, database::AppState, errors::AppError};
+use crate::{
+    auth::extractors::CurrentUser, base::templates::Base, database::AppState, errors::AppError,
+};
 
-pub async fn display_register_form() -> Result<impl IntoResponse, AppError> {
-    let register = RegisterTemplate::default();
-    let rendered = register.render()?;
+pub async fn display_register_form(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
+    // if existing user => no access to register page
+    if user.0.is_some() {
+        Ok(Redirect::to("/ideas").into_response())
+    } else {
+        let register = RegisterTemplate::default();
+        let rendered = register.render()?;
 
-    Ok((StatusCode::OK, Html(rendered)))
+        Ok((StatusCode::OK, Html(rendered)).into_response())
+    }
 }
 
 pub async fn register_user(
@@ -55,17 +62,21 @@ pub async fn register_user(
     }
 }
 
-pub async fn display_login_form() -> Result<impl IntoResponse, AppError> {
-    let login = LoginTemplate {
-        base: Base {
-            tab_title: "Login",
-            is_logged_in: false,
-        },
-        ..Default::default()
-    };
-    let rendered = login.render()?;
+pub async fn display_login_form(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
+    if user.0.is_some() {
+        Ok(Redirect::to("/ideas").into_response())
+    } else {
+        let login = LoginTemplate {
+            base: Base {
+                tab_title: "Login",
+                is_logged_in: false,
+            },
+            ..Default::default()
+        };
+        let rendered = login.render()?;
 
-    Ok((StatusCode::OK, Html(rendered)))
+        Ok((StatusCode::OK, Html(rendered)).into_response())
+    }
 }
 
 pub async fn login_user(
