@@ -27,6 +27,9 @@ pub enum AppError {
 
     #[error("Email already taken")]
     EmailAlreadyTaken,
+
+    #[error("Session layer missing")]
+    SessionLayerMissing,
 }
 
 // transform AppError to http response for Axum
@@ -56,6 +59,10 @@ impl IntoResponse for AppError {
                 "Error saving securely your password",
             ),
             AppError::EmailAlreadyTaken => (StatusCode::CONFLICT, "Email already taken"),
+            AppError::SessionLayerMissing => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Session layer is missing",
+            ),
         };
 
         (

@@ -1,5 +1,7 @@
 use askama::Template;
 
+use crate::base::templates::Base;
+
 pub struct Idea {
     pub description: String,
     pub id: u16,
@@ -8,21 +10,22 @@ pub struct Idea {
 #[derive(Template)]
 #[template(path = "ideas/show.html")]
 pub struct IdeaTemplate<'a> {
-    pub tab_title: &'a str,
+    pub base: Base<'a>,
     pub title: &'a str,
     pub idea: Idea,
-    pub is_logged_in: bool,
 }
 impl<'a> Default for IdeaTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Axum Idea",
+            base: Base {
+                tab_title: "Awesome idea",
+                ..Default::default()
+            },
             title: "Awesome Axum Idea",
             idea: Idea {
                 description: String::new(),
                 id: 0,
             },
-            is_logged_in: false,
         }
     }
 }
@@ -30,18 +33,19 @@ impl<'a> Default for IdeaTemplate<'a> {
 #[derive(Template)]
 #[template(path = "ideas/index.html")]
 pub struct IdeasTemplate<'a> {
-    pub tab_title: &'a str,
+    pub base: Base<'a>,
     pub title: &'a str,
     pub ideas: Vec<Idea>,
-    pub is_logged_in: bool,
 }
 impl<'a> Default for IdeasTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Axum Awesome Ideas",
+            base: Base {
+                tab_title: "Ideas",
+                ..Default::default()
+            },
             title: "Axum Awesome Ideas",
             ideas: Vec::new(),
-            is_logged_in: false,
         }
     }
 }
@@ -49,20 +53,21 @@ impl<'a> Default for IdeasTemplate<'a> {
 #[derive(Template)]
 #[template(path = "ideas/create.html")]
 pub struct CreateIdeaTemplate<'a> {
-    pub tab_title: &'a str,
+    pub base: Base<'a>,
     pub title: &'a str,
     pub error: Option<String>, // manage the validation error in the form
     pub description: String,
-    pub is_logged_in: bool,
 }
 impl<'a> Default for CreateIdeaTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Axum Create Idea",
+            base: Base {
+                tab_title: "Create idea",
+                ..Default::default()
+            },
             title: "Axum Create Idea",
             error: None,
             description: String::new(),
-            is_logged_in: false,
         }
     }
 }
@@ -79,23 +84,24 @@ impl<'a> CreateIdeaTemplate<'a> {
 #[derive(Template)]
 #[template(path = "ideas/edit.html")]
 pub struct EditIdeaTemplate<'a> {
-    pub tab_title: &'a str,
+    pub base: Base<'a>,
     pub title: &'a str,
     pub idea: Idea,
     pub error: Option<String>,
-    pub is_logged_in: bool,
 }
 impl<'a> Default for EditIdeaTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Axum Edit Idea",
+            base: Base {
+                tab_title: "Edit idea",
+                ..Default::default()
+            },
             title: "Axum Edit Idea",
             idea: Idea {
                 description: String::new(),
                 id: 0,
             },
             error: None,
-            is_logged_in: false,
         }
     }
 }

@@ -35,7 +35,7 @@
     </ul>
   </div>
   <div class="navbar-end">
-    {% if is_logged_in %}
+    {% if base.is_logged_in %}
     <form method="POST" action="/logout">
       <button type="submit" class="btn">Logout</button>
     </form>

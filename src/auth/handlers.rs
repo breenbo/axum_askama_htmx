@@ -10,15 +10,12 @@ use axum::{
 };
 use tower_sessions::Session;
 
-use crate::{
-    auth::{
-        database::{create_user, get_user},
-        models::{LoginForm, RegisterForm},
-        templates::{LoginTemplate, RegisterTemplate},
-    },
-    database::AppState,
-    errors::AppError,
+use super::{
+    database::{create_user, get_user},
+    models::{LoginForm, RegisterForm},
+    templates::{LoginTemplate, RegisterTemplate},
 };
+use crate::{base::templates::Base, database::AppState, errors::AppError};
 
 pub async fn display_register_form() -> Result<impl IntoResponse, AppError> {
     let register = RegisterTemplate::default();
@@ -45,13 +42,13 @@ pub async fn register_user(
         Err(AppError::EmailAlreadyTaken) => {
             tracing::error!("Error creating ");
             let reg = RegisterTemplate {
-                tab_title: "Register",
+                base: Base::default(),
                 name: user.name,
                 email: user.email,
                 error: Some("Email already taken"),
-                is_logged_in: false,
             };
             let rendered = reg.render()?;
+
             Ok((StatusCode::CONFLICT, Html(rendered)).into_response())
         }
         Err(e) => Err(e),
@@ -60,8 +57,10 @@ pub async fn register_user(
 
 pub async fn display_login_form() -> Result<impl IntoResponse, AppError> {
     let login = LoginTemplate {
-        tab_title: "Login",
-        is_logged_in: false,
+        base: Base {
+            tab_title: "Login",
+            is_logged_in: false,
+        },
     };
     let rendered = login.render()?;
 
@@ -86,13 +85,14 @@ pub async fn login_user(
     } else {
         tracing::warn!("Bad credentials");
 
-        // template with error in form, like the register
-        Ok(Redirect::to("ideas"))
+        // TODO: template with error in form, like the register
+        Ok(Redirect::to("/login"))
     }
 }
 
 pub async fn logout_user(session: Session) -> Result<impl IntoResponse, AppError> {
     session.remove::<i64>("user_id").await?;
+    tracing::info!("User logged out");
 
     Ok(Redirect::to("/login"))
 }

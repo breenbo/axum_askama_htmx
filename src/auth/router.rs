@@ -5,11 +5,10 @@ use axum::{
     routing::{get, post},
 };
 
-use super::handlers::{display_login_form, display_register_form};
-use crate::{
-    auth::handlers::{login_user, logout_user, register_user},
-    database::AppState,
+use super::handlers::{
+    display_login_form, display_register_form, login_user, logout_user, register_user,
 };
+use crate::database::AppState;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()

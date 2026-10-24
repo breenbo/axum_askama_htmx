@@ -5,3 +5,10 @@
 - in handlers, USE State(state): State<Arc<AppState>> to extract the state
 - Use Arc to have cheap copy/clone for AppState, sharing config and DbPool
 - if form used in html, use Form(user): Form<RegisterFrom>> to extract the datas
+- Form extractor must always be the last in handlers (consume the body because implement FromRequest)
+
+## AUTH
+
+- id of logged in user stored using sesssion: Session
+- use an extractor (function used in handlers) to get the loggedin state of the user everywhere, and call it in the handler. If return Ok, the value is passed to the handler, if Err, axum convert into http and handler not called. Extractor impl FromRequestPart (methods, url, headers, etc.), not the body
+- axum handlers works on several threads, so Send + Sync in extractor is mandatory

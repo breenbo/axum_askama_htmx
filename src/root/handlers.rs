@@ -5,15 +5,17 @@ use axum::{
 };
 
 use super::templates::RootTemplate;
-use crate::errors::AppError;
+use crate::{auth::extractors::CurrentUser, base::templates::Base, errors::AppError};
 
 // all function used in routes
 //
-pub async fn root() -> Result<impl IntoResponse, AppError> {
+pub async fn root(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get / root");
     let root = RootTemplate {
-        tab_title: "Some title",
-        is_logged_in: false,
+        base: Base {
+            tab_title: "Some title",
+            is_logged_in: user.0.is_some(),
+        },
     };
 
     let rendered = root.render()?;

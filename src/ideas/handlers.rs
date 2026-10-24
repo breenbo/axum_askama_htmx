@@ -8,31 +8,34 @@ use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Redirect, Response},
 };
-use tower_sessions::Session;
 use validator::Validate;
 
 use super::{
     database::{add_idea, get_idea, get_ideas, remove_idea, update_idea},
     models::IdeaForm,
-    templates::{EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate},
+    templates::{CreateIdeaTemplate, EditIdeaTemplate, Idea, IdeaTemplate, IdeasTemplate},
 };
-use crate::{database::AppState, errors::AppError, ideas::templates::CreateIdeaTemplate};
+use crate::{
+    auth::extractors::CurrentUser, base::templates::Base, database::AppState, errors::AppError,
+};
 
 pub async fn display_ideas(
     // access directly the sqlite connection
-    session: Session,
+    user: CurrentUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get /home");
 
-    let is_logged_in = session.get::<i64>("user_id").await?.is_some();
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
     let idas: Vec<Idea> = get_ideas(Arc::clone(&state)).await?;
 
     let ideas = IdeasTemplate {
         ideas: idas,
-        is_logged_in,
+        base: Base {
+            is_logged_in: user.0.is_some(),
+            ..Default::default()
+        },
         ..Default::default()
     };
 
@@ -41,8 +44,14 @@ pub async fn display_ideas(
     Ok((StatusCode::OK, Html(rendered)))
 }
 
-pub async fn display_create_idea() -> Result<impl IntoResponse, AppError> {
-    let create_idea = CreateIdeaTemplate::default();
+pub async fn display_create_idea(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
+    let create_idea = CreateIdeaTemplate {
+        base: Base {
+            is_logged_in: user.0.is_some(),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
     let rendered = create_idea.render()?;
 
     Ok((StatusCode::OK, Html(rendered)))
@@ -51,17 +60,19 @@ pub async fn display_create_idea() -> Result<impl IntoResponse, AppError> {
 // get one idea, the id is passed in the url "ideas/1" => use Path to get the value
 pub async fn display_idea(
     Path(id): Path<u16>,
-    session: Session,
+    user: CurrentUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get idea {id}");
 
     let ida = get_idea(id, Arc::clone(&state)).await?;
-    let is_logged_in = session.get::<i64>("user_id").await?.is_some();
 
     let idea = IdeaTemplate {
         idea: ida,
-        is_logged_in,
+        base: Base {
+            is_logged_in: user.0.is_some(),
+            ..Default::default()
+        },
         ..Default::default()
     };
 
@@ -72,12 +83,17 @@ pub async fn display_idea(
 
 pub async fn display_edit_idea(
     Path(id): Path<u16>,
+    user: CurrentUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     let idea = get_idea(id, Arc::clone(&state)).await?;
 
     let edit_idea = EditIdeaTemplate {
         idea,
+        base: Base {
+            is_logged_in: user.0.is_some(),
+            ..Default::default()
+        },
         ..Default::default()
     };
 

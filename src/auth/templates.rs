@@ -1,30 +1,32 @@
 use askama::Template;
 
+use crate::base::templates::Base;
+
 #[derive(Template)]
 #[template(path = "auth/Login.html")]
 pub struct LoginTemplate<'a> {
-    pub tab_title: &'a str,
-    pub is_logged_in: bool,
+    pub base: Base<'a>,
 }
 
 #[derive(Template)]
 #[template(path = "auth/Register.html")]
 pub struct RegisterTemplate<'a> {
-    pub tab_title: &'a str,
+    pub base: Base<'a>,
     pub name: String,
     pub email: String,
     pub error: Option<&'a str>,
-    pub is_logged_in: bool,
 }
 
 impl<'a> Default for RegisterTemplate<'a> {
     fn default() -> Self {
         Self {
-            tab_title: "Register",
+            base: Base {
+                tab_title: "Register",
+                ..Default::default()
+            },
             name: String::new(),
             email: String::new(),
             error: None,
-            is_logged_in: false,
         }
     }
 }
