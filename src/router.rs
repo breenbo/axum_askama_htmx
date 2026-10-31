@@ -5,6 +5,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use tower_sessions::{MemoryStore, SessionManagerLayer};
 
+use crate::admin::router as admin;
 use crate::auth::router as auth;
 use crate::database::AppState;
 use crate::ideas::router as ideas;
@@ -17,6 +18,7 @@ pub fn create_router(state: Arc<AppState>) -> Router {
     Router::new()
         .merge(root::router())
         .merge(auth::router())
+        .merge(admin::router())
         .merge(ideas::router())
         .with_state(state)
         .layer(session_layer)

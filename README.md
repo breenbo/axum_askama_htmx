@@ -1,11 +1,14 @@
-# Axum - Askama - Htmx project
+# Learning Axum - Askama - Htmx project following the Laracast path
 
 ## Object
 
-Goal: learn BE/Fullstack app with axum before going to Leptos/Dioxus, following the laracast BE pth
+Goal: learn BE/Fullstack app with axum before going to Leptos/Dioxus, following the Laracast BE path
 
-## Features
+## Implemented
 
-- architecture: domain driven structure, each with database, handlers, models, router, template files
-- Use Arc for cheap clone of the app_state accross the handlers
-- request validation with validator crate, and display error message below the textarea
+- routing
+- connect/store/get data from sqlite
+- register/login/logout
+- route protection
+- add/display ideas attached to logged in user
+- Authorization to access admin section only for admin user

@@ -7,13 +7,14 @@ pub struct LoginForm {
     pub password: String,
 }
 
-#[derive(Deserialize, Serialize, Validate)]
+#[derive(Deserialize, Serialize, Validate, Debug)]
 pub struct RegisterForm {
     pub name: String,
     #[validate(email)]
     pub email: String,
     #[validate(length(min = 8, message = "Must be at least 8 chars long"))]
     pub password: String,
+    pub role: Option<String>,
 }
 
 pub struct User {
@@ -21,4 +22,10 @@ pub struct User {
     pub name: String,
     pub email: String,
     pub hashed_pwd: String,
+    pub role: Option<String>,
+}
+
+pub struct AuthUser {
+    id: i64,
+    pub role: String,
 }

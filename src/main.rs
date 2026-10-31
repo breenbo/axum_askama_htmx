@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Result};
 
+mod admin;
 mod auth;
 mod base;
 mod database;

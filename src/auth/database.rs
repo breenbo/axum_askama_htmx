@@ -14,14 +14,15 @@ fn hash_password(pwd: &str) -> Result<String, Error> {
         .to_string())
 }
 
-pub async fn create_user(user: &RegisterForm, app_state: Arc<AppState>) -> Result<i64, AppError> {
+pub async fn create_user(user: &RegisterForm, app_state: &Arc<AppState>) -> Result<i64, AppError> {
     let hashed_pwd = hash_password(&user.password)?;
 
     let result = sqlx::query!(
-        "INSERT INTO users (name, email, password) VALUES (?,?,?)",
+        "INSERT INTO users (name, email, password, role) VALUES (?,?,?,?)",
         user.name,
         user.email,
         hashed_pwd,
+        user.role.as_deref()
     )
     .execute(&app_state.db)
     .await;
@@ -47,7 +48,23 @@ pub async fn get_user(email: &str, app_state: &Arc<AppState>) -> Result<Option<U
             name: res.name,
             email: res.email,
             hashed_pwd: res.password,
+            role: res.role,
         })),
         None => Ok(None),
+    }
+}
+
+pub async fn is_user_admin(id: i64, app_state: &Arc<AppState>) -> Result<Option<bool>, AppError> {
+    let res = sqlx::query_scalar!("SELECT role FROM users WHERE id = ?", id)
+        .fetch_optional(&app_state.db)
+        .await?;
+
+    match res {
+        Some(role) => {
+            let is_admin = role == Some("admin".to_string());
+
+            Ok(Some(is_admin))
+        }
+        None => Ok(Some(false)),
     }
 }

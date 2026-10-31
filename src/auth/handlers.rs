@@ -61,6 +61,7 @@ pub async fn display_login_form() -> Result<impl IntoResponse, AppError> {
         base: Base {
             tab_title: "Login",
             is_logged_in: false,
+            is_admin: false,
         },
         ..Default::default()
     };
