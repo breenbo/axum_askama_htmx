@@ -11,6 +11,7 @@
     <li>register/login/logout</li>
     <li>route protection</li>
     <li>add/display ideas attached to logged in user</li>
+    <li>Test helpers to populate the db</li>
   </ul>
   </div>
 </div>
@@ -19,4 +20,12 @@
         Go create awesome ideas
       </div>
     </a>
+    <div class="my-4">
+    Testing:  
+    </div>
+    <form method="POST" action="/populate">
+      <button class="btn btn-primary" type="submit">
+        Populate tables
+      </button>
+    </form>
 {% endblock %}

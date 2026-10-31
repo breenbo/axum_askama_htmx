@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use axum::Router;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use tower_sessions::{MemoryStore, SessionManagerLayer};
 
 use crate::auth::router as auth;
@@ -18,4 +20,9 @@ pub fn create_router(state: Arc<AppState>) -> Router {
         .merge(ideas::router())
         .with_state(state)
         .layer(session_layer)
+        .fallback(not_found)
+}
+
+async fn not_found() -> impl IntoResponse {
+    (StatusCode::NOT_FOUND, "Route not found")
 }

@@ -6,8 +6,8 @@ use axum::{
 };
 
 use super::handlers::{
-    create_idea, delete_idea, display_create_idea, display_edit_idea, display_idea, display_ideas,
-    edit_idea,
+    create_idea, delete_idea, display_create_idea, display_edit_idea, edit_idea, index_ideas,
+    show_idea,
 };
 use crate::{auth::middlewares::require_auth, database::AppState};
 
@@ -17,11 +17,11 @@ pub fn router() -> Router<Arc<AppState>> {
         .route("/ideas/create", get(display_create_idea))
         .route("/ideas/{id}/edit", get(display_edit_idea).post(edit_idea))
         .route("/ideas/{id}/delete", post(delete_idea))
+        .route("/ideas", get(index_ideas).post(create_idea))
+        .route("/ideas/{id}", get(show_idea))
         .route_layer(middleware::from_fn(require_auth));
 
-    let public = Router::new()
-        .route("/ideas", get(display_ideas).post(create_idea))
-        .route("/ideas/{id}", get(display_idea));
+    let public = Router::new();
 
     public.merge(protected)
 }

@@ -1,5 +1,6 @@
 {% extends "../base.html" %} {% block content %}
   {% if ideas.len() > 0 %}
+  <div class="pb-10">
     <div class="mt-8">
       <h2 class="text-4xl mb-6">
         {{title}}
@@ -20,5 +21,6 @@
         Go create awesome ideas
       </div>
     </a>
+  </div>
   {% endif %}
 {% endblock %}

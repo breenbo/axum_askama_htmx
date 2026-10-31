@@ -33,7 +33,7 @@ pub async fn register_user(
     tracing::info!("Register user: {}", user.email);
 
     // match the error of insert into sql to check if email is already taken
-    match create_user(&user, Arc::clone(&state)).await {
+    match create_user(&user, &state).await {
         Ok(user_id) => {
             tracing::info!("User created");
             log_in_session(&session, user_id).await?;

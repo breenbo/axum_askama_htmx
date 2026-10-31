@@ -19,7 +19,7 @@ use crate::{
     auth::extractors::CurrentUser, base::templates::Base, database::AppState, errors::AppError,
 };
 
-pub async fn display_ideas(
+pub async fn index_ideas(
     // access directly the sqlite connection
     user: CurrentUser,
     State(state): State<Arc<AppState>>,
@@ -29,7 +29,7 @@ pub async fn display_ideas(
     // last unwrap to manage the Option inside the Result
     // Error in Result managed by ?
     let user_id = user.0;
-    let idas: Vec<Idea> = get_ideas(Arc::clone(&state), user_id).await?;
+    let idas: Vec<Idea> = get_ideas(&state, user_id).await?;
 
     let ideas = IdeasTemplate {
         ideas: idas,
@@ -45,14 +45,14 @@ pub async fn display_ideas(
     Ok((StatusCode::OK, Html(rendered)))
 }
 // get one idea, the id is passed in the url "ideas/1" => use Path to get the value
-pub async fn display_idea(
+pub async fn show_idea(
     Path(id): Path<u16>,
     user: CurrentUser,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get idea {id}");
 
-    let ida = get_idea(id, Arc::clone(&state)).await?;
+    let ida = get_idea(id, &state).await?;
 
     let idea = IdeaTemplate {
         idea: ida,
@@ -72,7 +72,7 @@ pub async fn display_edit_idea(
     Path(id): Path<u16>,
     State(state): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, AppError> {
-    let idea = get_idea(id, Arc::clone(&state)).await?;
+    let idea = get_idea(id, &state).await?;
 
     let edit_idea = EditIdeaTemplate {
         idea,
@@ -121,7 +121,7 @@ pub async fn create_idea(
     }
 
     let user_id = user.0;
-    add_idea(&form.description, Arc::clone(&state), user_id).await?;
+    add_idea(&form.description, &state, user_id).await?;
 
     Ok(Redirect::to("/ideas").into_response())
 }
@@ -147,7 +147,7 @@ pub async fn edit_idea(
         return Ok((StatusCode::UNPROCESSABLE_ENTITY, Html(rendered)).into_response());
     }
 
-    update_idea(id, &form.description, Arc::clone(&state)).await?;
+    update_idea(id, &form.description, &state).await?;
 
     Ok(Redirect::to(&format!("/ideas/{id}")).into_response())
 }
@@ -158,7 +158,7 @@ pub async fn delete_idea(
 ) -> Result<Redirect, AppError> {
     tracing::info!("Delete ideas : {}", id);
 
-    remove_idea(id, Arc::clone(&state)).await?;
+    remove_idea(id, &state).await?;
 
     Ok(Redirect::to("/ideas"))
 }

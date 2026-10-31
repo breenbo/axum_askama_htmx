@@ -5,7 +5,7 @@ use crate::{database::AppState, errors::AppError};
 
 pub async fn add_idea(
     idea: &str,
-    app_state: Arc<AppState>,
+    app_state: &Arc<AppState>,
     user_id: Option<i64>,
 ) -> Result<(), AppError> {
     if let Some(user_id) = user_id {
@@ -24,7 +24,7 @@ pub async fn add_idea(
 pub async fn update_idea(
     id: u16,
     new_idea: &str,
-    app_state: Arc<AppState>,
+    app_state: &Arc<AppState>,
 ) -> Result<(), AppError> {
     sqlx::query!("UPDATE ideas SET description=? WHERE id=?", new_idea, id)
         .execute(&app_state.db)
@@ -34,7 +34,7 @@ pub async fn update_idea(
 }
 
 pub async fn get_ideas(
-    app_state: Arc<AppState>,
+    app_state: &Arc<AppState>,
     user_id: Option<i64>,
 ) -> Result<Vec<Idea>, AppError> {
     // get only one column with query_scalar!, as query! return the full row
@@ -58,7 +58,7 @@ pub async fn get_ideas(
     Ok(ideas)
 }
 
-pub async fn get_idea(id: u16, app_state: Arc<AppState>) -> Result<Idea, AppError> {
+pub async fn get_idea(id: u16, app_state: &Arc<AppState>) -> Result<Idea, AppError> {
     let record = sqlx::query!("SELECT description,id FROM ideas WHERE id = ?", id)
         .fetch_one(&app_state.db)
         .await?;
@@ -71,7 +71,7 @@ pub async fn get_idea(id: u16, app_state: Arc<AppState>) -> Result<Idea, AppErro
     Ok(idea)
 }
 
-pub async fn remove_idea(id: u16, app_state: Arc<AppState>) -> Result<(), AppError> {
+pub async fn remove_idea(id: u16, app_state: &Arc<AppState>) -> Result<(), AppError> {
     sqlx::query!("DELETE FROM ideas WHERE id = ?", id)
         .execute(&app_state.db)
         .await?;

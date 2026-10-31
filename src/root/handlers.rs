@@ -11,10 +11,12 @@ use crate::{auth::extractors::CurrentUser, base::templates::Base, errors::AppErr
 //
 pub async fn root(user: CurrentUser) -> Result<impl IntoResponse, AppError> {
     tracing::info!("Get / root");
+
     let root = RootTemplate {
         base: Base {
             tab_title: "Some title",
             is_logged_in: user.0.is_some(),
+            ..Default::default()
         },
     };
 
